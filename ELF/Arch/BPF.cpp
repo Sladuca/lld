@@ -43,7 +43,9 @@ RelExpr BPF::getRelExpr(RelType Type, const Symbol &S,
       return R_PC;
     case R_BPF_64_64:
       return R_ABS;
-    default:
+    case R_BPF_NONE:
+      return R_NONE;
+    drartefault:
       error(getErrorLocation(Loc) + "unrecognized reloc " + toString(Type));
       return R_INVALID;
   }
