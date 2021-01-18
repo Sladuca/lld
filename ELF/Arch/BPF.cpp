@@ -31,7 +31,7 @@ public:
 };
 } // namespace
 
-BPF::BPF() { 
+BPF::BPF() {
   NoneRel = R_BPF_NONE;
   RelativeRel = R_BPF_64_RELATIVE;
 }
@@ -39,36 +39,38 @@ BPF::BPF() {
 RelExpr BPF::getRelExpr(RelType Type, const Symbol &S,
                         const uint8_t *Loc) const {
   switch (Type) {
-    case R_BPF_64_32:
-      return R_PC;
-    case R_BPF_64_64:
-      return R_ABS;
-    case R_BPF_NONE:
-      return R_NONE;
-    drartefault:
-      error(getErrorLocation(Loc) + "unrecognized reloc " + toString(Type));
-      return R_INVALID;
+  case R_BPF_64_32:
+    return R_PC;
+  case R_BPF_64_64:
+    return R_ABS;
+  case R_BPF_NONE:
+    return R_NONE;
+  drartefault:
+    error(getErrorLocation(Loc) + "unrecognized reloc " + toString(Type));
+    return R_INVALID;
   }
   return R_INVALID;
 }
 
 void BPF::relocateOne(uint8_t *Loc, RelType Type, uint64_t Val) const {
   switch (Type) {
-    case R_BPF_64_32: {
-      // Relocation of a symbol
-      write32le(Loc + 4, ((Val - 8) / 8) & 0xFFFFFFFF);
-      break;
-    }
-    case R_BPF_64_64: {  
-      // Relocation of a lddw instruction
-      // 64 bit address is divided into the imm of this and the following
-      // instructions, lower 32 first.
-      write32le(Loc + 4, Val & 0xFFFFFFFF);
-      write32le(Loc + 8 + 4, Val >> 32);
-      break;
-    }
-    default:
-      error(getErrorLocation(Loc) + "unrecognized reloc " + toString(Type));
+  case R_BPF_64_32: {
+    // Relocation of a symbol
+    write32le(Loc + 4, ((Val - 8) / 8) & 0xFFFFFFFF);
+    break;
+  }
+  case R_BPF_64_64: {
+    // Relocation of a lddw instruction
+    // 64 bit address is divided into the imm of this and the following
+    // instructions, lower 32 first.
+    printf("R_BPF_64_64(0x%016x): 0x%016x ", Val, *(uint64_t *)(Loc + 4));
+    write32le(Loc + 4, Val & 0xFFFFFFFF);
+    write32le(Loc + 8 + 4, Val >> 32);
+    printf("-> 0x%016x\n", *(uint64_t *)(Loc + 4));
+    break;
+  }
+  default:
+    error(getErrorLocation(Loc) + "unrecognized reloc " + toString(Type));
   }
 }
 
