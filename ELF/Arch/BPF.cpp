@@ -56,7 +56,14 @@ void BPF::relocateOne(uint8_t *Loc, RelType Type, uint64_t Val) const {
   switch (Type) {
   case R_BPF_64_32: {
     // Relocation of a symbol
-    write32le(Loc + 4, ((Val - 8) / 8) & 0xFFFFFFFF);
+    printf("R_BPF_64_32(0x%016x): 0x%08x ", Val, *(uint32_t *)(Loc + 4));
+    if (Val < 8) {
+      write32le(Loc + 4, Val & 0xFFFFFFFF);
+      printf("-> 0x%08x\n", *(uint32_t *)(Loc + 4));
+    } else {
+      write32le(Loc + 4, ((Val - 8) / 8) & 0xFFFFFFFF);
+      printf("-> 0x%08x\n", *(uint32_t *)(Loc + 4));
+    }
     break;
   }
   case R_BPF_64_64: {

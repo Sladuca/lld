@@ -789,6 +789,14 @@ void InputSection::relocateNonAlloc(uint8_t *Buf, ArrayRef<RelTy> Rels) {
     if (!RelTy::IsRela)
       Addend += Target->getImplicitAddend(BufLoc, Type);
 
+    if (Type == R_BPF_64_32) {
+      printf("R_BPF_64_32: offset=0x%016x, BufLoc=0x%016x, addend=0x%016x\n",
+             Offset, BufLoc, Addend);
+    }
+    if (Type == R_BPF_64_64) {
+      printf("R_BPF_64_64: offset=0x%016x, BufLoc=0x%016x, addend=0x%016x\n",
+             Offset, BufLoc, Addend);
+    }
     Symbol &Sym = getFile<ELFT>()->getRelocTargetSym(Rel);
     RelExpr Expr = Target->getRelExpr(Type, Sym, BufLoc);
     if (Expr == R_NONE)
@@ -1233,7 +1241,8 @@ SectionPiece *MergeInputSection::getSectionPiece(uint64_t Offset) {
     return &Pieces[It->second];
 
   // If Offset is not at beginning of a section piece, it is not in the map.
-  // In that case we need to  do a binary search of the original section piece vector.
+  // In that case we need to  do a binary search of the original section piece
+  // vector.
   auto I = fastUpperBound(
       Pieces.begin(), Pieces.end(), Offset,
       [](const uint64_t &A, const SectionPiece &B) { return A < B.InputOff; });
@@ -1248,7 +1257,7 @@ uint64_t MergeInputSection::getParentOffset(uint64_t Offset) const {
   // If Offset is not at beginning of a section piece, it is not in the map.
   // In that case we need to search from the original section piece vector.
   const SectionPiece &Piece =
-      *(const_cast<MergeInputSection *>(this)->getSectionPiece (Offset));
+      *(const_cast<MergeInputSection *>(this)->getSectionPiece(Offset));
   uint64_t Addend = Offset - Piece.InputOff;
   return Piece.OutputOff + Addend;
 }
