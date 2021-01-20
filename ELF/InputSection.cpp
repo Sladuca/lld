@@ -789,14 +789,6 @@ void InputSection::relocateNonAlloc(uint8_t *Buf, ArrayRef<RelTy> Rels) {
     if (!RelTy::IsRela)
       Addend += Target->getImplicitAddend(BufLoc, Type);
 
-    if (Type == R_BPF_64_32) {
-      printf("R_BPF_64_32: offset=0x%016x, BufLoc=0x%016x, addend=0x%016x\n",
-             Offset, BufLoc, Addend);
-    }
-    if (Type == R_BPF_64_64) {
-      printf("R_BPF_64_64: offset=0x%016x, BufLoc=0x%016x, addend=0x%016x\n",
-             Offset, BufLoc, Addend);
-    }
     Symbol &Sym = getFile<ELFT>()->getRelocTargetSym(Rel);
     RelExpr Expr = Target->getRelExpr(Type, Sym, BufLoc);
     if (Expr == R_NONE)

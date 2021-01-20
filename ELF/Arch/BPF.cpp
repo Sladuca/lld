@@ -42,6 +42,7 @@ RelExpr BPF::getRelExpr(RelType Type, const Symbol &S,
   case R_BPF_64_32:
     return R_PC;
   case R_BPF_64_64:
+    printf("R_BPF_64_64: symbol type: %d\n", S.kind());
     return R_ABS;
   case R_BPF_NONE:
     return R_NONE;
